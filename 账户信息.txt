@@ -1,0 +1,4 @@
+VPN:vsky-liulei   1qaz#EDC
+堡垒机：:liulei 1qaz@WSX123
+
+申请172.18.5.24服务器

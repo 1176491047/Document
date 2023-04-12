@@ -1,0 +1,7 @@
+Add-Migration AddWorkMasterTable 生成数据库脚本 "AddWorkMasterTable" 备注
+
+ Remove-Migration 清除
+
+update-database -Context UnifiedDbContext 执行脚本 “UnifiedDbContext”上下文名称
+
+dotnet build /graphBuild  加载引用

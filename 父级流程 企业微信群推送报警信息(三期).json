@@ -1,0 +1,749 @@
+{
+  "$id": "1",
+  "definitionId": "9f5f59162d324fe0a0a0193153bd6564",
+  "versionId": "15c8bd38c1884df88c981ea427f86314",
+  "name": "新版 企业微信群推送报警信息(三期)",
+  "displayName": "父级流程 企业微信群推送报警信息(三期)",
+  "description": "新版 企业微信群推送报警信息(NEW)",
+  "version": 10,
+  "variables": {
+    "$id": "2",
+    "data": {}
+  },
+  "customAttributes": {
+    "$id": "3",
+    "data": {}
+  },
+  "isSingleton": false,
+  "persistenceBehavior": "WorkflowBurst",
+  "deleteCompletedInstances": false,
+  "isPublished": false,
+  "isLatest": true,
+  "activities": [
+    {
+      "$id": "4",
+      "activityId": "6d5eb9d7-aedc-4079-b23e-c35ff5fd09fa",
+      "type": "HttpEndpoint",
+      "displayName": "报警/消除报警触发",
+      "description": "报警或者消除报警时会触发流程 并且传入报警信息的详细信息",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "5",
+          "name": "Path",
+          "expressions": {
+            "$id": "6",
+            "Literal": "/WechatMessage/Push"
+          }
+        },
+        {
+          "$id": "7",
+          "name": "Methods",
+          "expressions": {
+            "$id": "8",
+            "Json": "[\"POST\"]"
+          }
+        },
+        {
+          "$id": "9",
+          "name": "ReadContent",
+          "expressions": {
+            "$id": "10",
+            "Literal": "true"
+          }
+        },
+        {
+          "$id": "11",
+          "name": "TargetType",
+          "expressions": {
+            "$id": "12",
+            "Literal": "alarmInfo"
+          }
+        },
+        {
+          "$id": "13",
+          "name": "Schema",
+          "syntax": "Literal",
+          "expressions": {
+            "$id": "14",
+            "Literal": "{\r\n  \"type\": \"object\",\r\n  \"properties\": {\r\n    \"AlarmData\": {\r\n      \"type\": \"object\",\r\n      \"properties\": {\r\n        \"ID\": { \"type\": \"string\" },\r\n        \"MachineID\": { \"type\": \"string\" },\r\n        \"MachineName\": { \"type\": \"string\" },\r\n        \"AlarmID\": { \"type\": \"string\" },\r\n        \"AlarmText\": { \"type\": \"string\" },\r\n        \"OccrTime\": { \"type\": \"string\" }\r\n      }\r\n    },\r\n    \"AlarmLevel\": { \"type\": \"string\" },\r\n    \"PushEmails\": { \"type\": \"string\" }\r\n  }\r\n}"
+          }
+        },
+        {
+          "$id": "15",
+          "name": "Authorize",
+          "expressions": {
+            "$id": "16"
+          }
+        },
+        {
+          "$id": "17",
+          "name": "Policy",
+          "expressions": {
+            "$id": "18"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    },
+    {
+      "$id": "19",
+      "activityId": "2a0c1df6-1aa4-4763-93b1-a2d4e9c3e267",
+      "type": "SetVariable",
+      "displayName": "处理数据放入内存",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "20",
+          "name": "VariableName",
+          "expressions": {
+            "$id": "21",
+            "Literal": "alarmInfo"
+          }
+        },
+        {
+          "$id": "22",
+          "name": "Value",
+          "syntax": "JavaScript",
+          "expressions": {
+            "$id": "23",
+            "JavaScript": "return input.Body;"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    },
+    {
+      "$id": "24",
+      "activityId": "3be36adb-e1a5-4ddc-bae1-f7941a63652d",
+      "type": "FileHandling",
+      "displayName": "数据处理",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "25",
+          "name": "DataType",
+          "expressions": {
+            "$id": "26",
+            "Literal": "object"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    },
+    {
+      "$id": "27",
+      "activityId": "6ce8c599-9253-4d8a-aed0-18d41afab4ba",
+      "type": "If",
+      "displayName": "判断报警是否仍存在",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "28",
+          "name": "Condition",
+          "syntax": "JavaScript",
+          "expressions": {
+            "$id": "29",
+            "JavaScript": "var a = JSON.parse(input.response);\r\nsetVariable(\"checkResult\",a);\r\nif(a.body==\"True\"){\r\n    setVariable(\"sended\",\"1\");\r\n    return true;\r\n    }\r\n    else{\r\n    setVariable(\"sended\",\"0\");\r\n        return false\r\n      }\r\nreturn true;"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    },
+    {
+      "$id": "30",
+      "activityId": "9ce41aad-5fc1-420f-868f-ab9720a37ea9",
+      "type": "WeiChatActivity",
+      "displayName": "第一次 发送微信消息",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "31",
+          "name": "Url",
+          "syntax": "JavaScript",
+          "expressions": {
+            "$id": "32",
+            "Literal": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=f08c75d0-55d5-4427-89ea-d06691096c9d",
+            "JavaScript": "var alarmInfo= getVariable(\"alarmInfo\")\r\n\r\nreturn alarmInfo.PushEmails;"
+          }
+        },
+        {
+          "$id": "33",
+          "name": "Receivers",
+          "expressions": {
+            "$id": "34",
+            "Literal": "1"
+          }
+        },
+        {
+          "$id": "35",
+          "name": "Content",
+          "syntax": "JavaScript",
+          "expressions": {
+            "$id": "36",
+            "JavaScript": "var alarmInfo= getVariable(\"alarmInfo\")\r\nvar alarmData= alarmInfo.AlarmData;\r\nvar message = \"报警触发(首次发送)<br>\";\r\nmessage+= \"设备:\"+alarmData.MachineName+\"[\"+alarmData.MachineID+\"]<br>\";\r\nmessage+=\"告警:\"+alarmData.AlarmText+\"[\"+alarmData.AlarmID+\"]<br>\";\r\nmessage+=\"时间:\"+alarmData.OccrTime;\r\nreturn message;"
+          }
+        },
+        {
+          "$id": "37",
+          "name": "Title",
+          "expressions": {
+            "$id": "38"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    },
+    {
+      "$id": "39",
+      "activityId": "af7c910d-1c88-4061-888f-af977797609b",
+      "type": "Switch",
+      "name": "SetOrClear",
+      "displayName": "区分请求类型为报警触发还是消除",
+      "description": "SetOrClear",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "40",
+          "name": "Cases",
+          "expressions": {
+            "$id": "41",
+            "Switch": "[{\"name\":\"Set\",\"syntax\":\"JavaScript\",\"expressions\":{\"JavaScript\":\"var alarmInfo= getVariable(\\\"alarmInfo\\\"); var alarmData= alarmInfo.AlarmData; if(alarmData.SetOrClear==\\\"Set\\\"){return true}\"}},{\"name\":\"Clear\",\"syntax\":\"JavaScript\",\"expressions\":{\"JavaScript\":\"var alarmInfo= getVariable(\\\"alarmInfo\\\"); var alarmData= alarmInfo.AlarmData; if(alarmData.SetOrClear==\\\"Clear\\\"){return true}\"}}]"
+          }
+        },
+        {
+          "$id": "42",
+          "name": "Mode",
+          "expressions": {
+            "$id": "43"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    },
+    {
+      "$id": "44",
+      "activityId": "2fb28e6c-c718-4b08-889f-e05d379c4f83",
+      "type": "RunWorkflow",
+      "name": "waitingForSendClear",
+      "displayName": "启动子流程 等待发送消除消息",
+      "description": "启动子流程 等待发送消除消息\n消息包括：\n子流程的唯一id(用报警id)\n是否发送过消息的标识  子流程根据标识在触发的时候决定是否发送消除消息",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "45",
+          "name": "WorkflowDefinitionId",
+          "expressions": {
+            "$id": "46",
+            "Literal": "da78a0ac0a0b441d84ba9a16d3d720a7"
+          }
+        },
+        {
+          "$id": "47",
+          "name": "Input",
+          "syntax": "JavaScript",
+          "expressions": {
+            "$id": "48",
+            "Literal": "123",
+            "JavaScript": "var sended = getVariable(\"sended\");\r\nvar alarmInfo= getVariable(\"alarmInfo\");\r\nvar data = alarmInfo.AlarmData;\r\nlet  childInput = {\r\nsend:sended,\r\ncwid:data.ID,\r\nalarm:alarmInfo\r\n};\r\nsetVariable(\"v\",JSON.stringify(childInput));\r\nreturn childInput;"
+          }
+        },
+        {
+          "$id": "49",
+          "name": "PossibleOutcomes",
+          "expressions": {
+            "$id": "50"
+          }
+        },
+        {
+          "$id": "51",
+          "name": "Mode",
+          "expressions": {
+            "$id": "52"
+          }
+        },
+        {
+          "$id": "53",
+          "name": "TenantId",
+          "expressions": {
+            "$id": "54"
+          }
+        },
+        {
+          "$id": "55",
+          "name": "CorrelationId",
+          "expressions": {
+            "$id": "56"
+          }
+        },
+        {
+          "$id": "57",
+          "name": "ContextId",
+          "expressions": {
+            "$id": "58"
+          }
+        },
+        {
+          "$id": "59",
+          "name": "CustomAttributes",
+          "expressions": {
+            "$id": "60"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    },
+    {
+      "$id": "61",
+      "activityId": "d6d3557c-3c62-432a-9f8a-09c74d3c26dc",
+      "type": "Timer",
+      "displayName": "第一级定时器 判断是否已经消除",
+      "description": "如果在规定时间内已经消除收到清除指令时不发送消息\n如果未在规定时间内消除报警 则用户已经收到过报警信息  需要发送消息告知用户报警已经消除",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "62",
+          "name": "Timeout",
+          "expressions": {
+            "$id": "63",
+            "Literal": "0:00:01:00"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    },
+    {
+      "$id": "64",
+      "activityId": "35a34a63-cf6c-4d35-9fd6-80eeec011eee",
+      "type": "SendHttpRequest",
+      "displayName": "请求业务系统判断报警是否已经消除",
+      "description": "请求业务系统判断报警是否已经消除",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "65",
+          "name": "Url",
+          "syntax": "JavaScript",
+          "expressions": {
+            "$id": "66",
+            "JavaScript": "var alarmInfo= getVariable(\"alarmInfo\")\r\n//消息报警验证服务接口地址 Http/Https + :// + IP:Port \r\nvar baseAddress=\"http://10.21.21.235:5100\";\r\nreturn baseAddress+\"/MachineAlarm/CheckAlarmStatus?ID=\"+alarmInfo.AlarmData.ID;"
+          }
+        },
+        {
+          "$id": "67",
+          "name": "Method",
+          "expressions": {
+            "$id": "68"
+          }
+        },
+        {
+          "$id": "69",
+          "name": "Content",
+          "expressions": {
+            "$id": "70"
+          }
+        },
+        {
+          "$id": "71",
+          "name": "ContentType",
+          "expressions": {
+            "$id": "72",
+            "Literal": "application/json"
+          }
+        },
+        {
+          "$id": "73",
+          "name": "ReadContent",
+          "expressions": {
+            "$id": "74",
+            "Literal": "true"
+          }
+        },
+        {
+          "$id": "75",
+          "name": "ResponseContentParserName",
+          "expressions": {
+            "$id": "76",
+            "Literal": "JSON"
+          }
+        },
+        {
+          "$id": "77",
+          "name": "ResponseContentTargetType",
+          "expressions": {
+            "$id": "78"
+          }
+        },
+        {
+          "$id": "79",
+          "name": "SupportedStatusCodes",
+          "expressions": {
+            "$id": "80",
+            "Json": "[\"200\"]"
+          }
+        },
+        {
+          "$id": "81",
+          "name": "Authorization",
+          "expressions": {
+            "$id": "82"
+          }
+        },
+        {
+          "$id": "83",
+          "name": "RequestHeaders",
+          "expressions": {
+            "$id": "84"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    },
+    {
+      "$id": "85",
+      "activityId": "70a52bb1-c1e0-4424-9c7b-e7e532e6acc8",
+      "type": "SendSignal",
+      "displayName": "发送信号给子流程(是否发送消除消息)",
+      "description": "信号发送给子流程后子流程会根据流程创建时的报警状态判断是否发送消息",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "86",
+          "name": "Signal",
+          "expressions": {
+            "$id": "87",
+            "Literal": "OK"
+          }
+        },
+        {
+          "$id": "88",
+          "name": "CorrelationId",
+          "syntax": "JavaScript",
+          "expressions": {
+            "$id": "89",
+            "Literal": "MachineID_AlarmID_TimeStamp",
+            "JavaScript": "\r\nvar alarmInfo= getVariable(\"alarmInfo\");\r\nvar data = alarmInfo.AlarmData;\r\nreturn data.ID;"
+          }
+        },
+        {
+          "$id": "90",
+          "name": "Input",
+          "expressions": {
+            "$id": "91",
+            "Literal": "",
+            "JavaScript": ""
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    },
+    {
+      "$id": "92",
+      "activityId": "12b89b2c-2fdd-4902-a609-c9e164c80214",
+      "type": "Timer",
+      "displayName": "第二级定时器 循环判断是否消除",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "93",
+          "name": "Timeout",
+          "expressions": {
+            "$id": "94",
+            "Literal": "0:00:00:01"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    },
+    {
+      "$id": "95",
+      "activityId": "edc1bc03-1527-447f-966c-049b413a91b6",
+      "type": "SendHttpRequest",
+      "displayName": "发送请求",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "96",
+          "name": "Url",
+          "syntax": "JavaScript",
+          "expressions": {
+            "$id": "97",
+            "Literal": "",
+            "JavaScript": "var alarmInfo= getVariable(\"alarmInfo\")  \r\nreturn \"http://10.21.21.235:5100/MachineAlarm/CheckAlarmStatus?ID=\"+alarmInfo.AlarmData.ID;"
+          }
+        },
+        {
+          "$id": "98",
+          "name": "Method",
+          "expressions": {
+            "$id": "99"
+          }
+        },
+        {
+          "$id": "100",
+          "name": "Content",
+          "expressions": {
+            "$id": "101"
+          }
+        },
+        {
+          "$id": "102",
+          "name": "ContentType",
+          "expressions": {
+            "$id": "103",
+            "Literal": "application/json"
+          }
+        },
+        {
+          "$id": "104",
+          "name": "ReadContent",
+          "expressions": {
+            "$id": "105",
+            "Literal": "true"
+          }
+        },
+        {
+          "$id": "106",
+          "name": "ResponseContentParserName",
+          "expressions": {
+            "$id": "107",
+            "Literal": "JSON"
+          }
+        },
+        {
+          "$id": "108",
+          "name": "ResponseContentTargetType",
+          "expressions": {
+            "$id": "109"
+          }
+        },
+        {
+          "$id": "110",
+          "name": "SupportedStatusCodes",
+          "expressions": {
+            "$id": "111",
+            "Json": "[\"200\"]"
+          }
+        },
+        {
+          "$id": "112",
+          "name": "Authorization",
+          "expressions": {
+            "$id": "113"
+          }
+        },
+        {
+          "$id": "114",
+          "name": "RequestHeaders",
+          "expressions": {
+            "$id": "115"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    },
+    {
+      "$id": "116",
+      "activityId": "8b9b0fb9-5cbb-44ce-b59d-ac4de917792b",
+      "type": "FileHandling",
+      "displayName": "数据处理",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "117",
+          "name": "DataType",
+          "expressions": {
+            "$id": "118",
+            "Literal": "object"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    },
+    {
+      "$id": "119",
+      "activityId": "5447e1fc-c9b7-494d-8f34-b2ad71310992",
+      "type": "If",
+      "displayName": "判断报警是否仍存在",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "120",
+          "name": "Condition",
+          "syntax": "JavaScript",
+          "expressions": {
+            "$id": "121",
+            "JavaScript": "var a = JSON.parse(input.response);\r\nvar sendCount = getVariable(\"sendCount\");\r\nif(sendCount==null||sendCount==\"\") setVariable(\"sendCount\",\"1\");\r\nsendCount+=1;\r\nif(sendCount==90) return false;\r\nsetVariable(\"sendCount\",sendCount);\r\n//True表示未处理\r\nif(a.body==\"True\"){return true;}else{return false}"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    },
+    {
+      "$id": "122",
+      "activityId": "5752e257-d7ea-4422-a54b-10e8028faf5e",
+      "type": "WeiChatActivity",
+      "displayName": "循环发送微信 直到消除",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "123",
+          "name": "Url",
+          "syntax": "JavaScript",
+          "expressions": {
+            "$id": "124",
+            "JavaScript": "var alarmInfo= getVariable(\"alarmInfo\")\r\n\r\nreturn alarmInfo.PushEmails;"
+          }
+        },
+        {
+          "$id": "125",
+          "name": "Receivers",
+          "expressions": {
+            "$id": "126",
+            "Literal": "1"
+          }
+        },
+        {
+          "$id": "127",
+          "name": "Content",
+          "syntax": "JavaScript",
+          "expressions": {
+            "$id": "128",
+            "JavaScript": "var alarmInfo= getVariable(\"alarmInfo\")\r\nvar alarmData= alarmInfo.AlarmData;\r\nvar message = \"报警触发<br>\";\r\nmessage+= \"设备:\"+alarmData.MachineName+\"[\"+alarmData.MachineID+\"]<br>\";\r\nmessage+=\"告警:\"+alarmData.AlarmText+\"[\"+alarmData.AlarmID+\"]<br>\";\r\nmessage+=\"时间:\"+alarmData.OccrTime;\r\nreturn message;"
+          }
+        },
+        {
+          "$id": "129",
+          "name": "Title",
+          "expressions": {
+            "$id": "130"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    }
+  ],
+  "connections": [
+    {
+      "$id": "131",
+      "sourceActivityId": "6d5eb9d7-aedc-4079-b23e-c35ff5fd09fa",
+      "targetActivityId": "2a0c1df6-1aa4-4763-93b1-a2d4e9c3e267",
+      "outcome": "Done"
+    },
+    {
+      "$id": "132",
+      "sourceActivityId": "3be36adb-e1a5-4ddc-bae1-f7941a63652d",
+      "targetActivityId": "6ce8c599-9253-4d8a-aed0-18d41afab4ba",
+      "outcome": "Done"
+    },
+    {
+      "$id": "133",
+      "sourceActivityId": "6ce8c599-9253-4d8a-aed0-18d41afab4ba",
+      "targetActivityId": "9ce41aad-5fc1-420f-868f-ab9720a37ea9",
+      "outcome": "True"
+    },
+    {
+      "$id": "134",
+      "sourceActivityId": "af7c910d-1c88-4061-888f-af977797609b",
+      "targetActivityId": "d6d3557c-3c62-432a-9f8a-09c74d3c26dc",
+      "outcome": "Set"
+    },
+    {
+      "$id": "135",
+      "sourceActivityId": "d6d3557c-3c62-432a-9f8a-09c74d3c26dc",
+      "targetActivityId": "35a34a63-cf6c-4d35-9fd6-80eeec011eee",
+      "outcome": "Done"
+    },
+    {
+      "$id": "136",
+      "sourceActivityId": "35a34a63-cf6c-4d35-9fd6-80eeec011eee",
+      "targetActivityId": "3be36adb-e1a5-4ddc-bae1-f7941a63652d",
+      "outcome": "200"
+    },
+    {
+      "$id": "137",
+      "sourceActivityId": "af7c910d-1c88-4061-888f-af977797609b",
+      "targetActivityId": "70a52bb1-c1e0-4424-9c7b-e7e532e6acc8",
+      "outcome": "Clear"
+    },
+    {
+      "$id": "138",
+      "sourceActivityId": "2a0c1df6-1aa4-4763-93b1-a2d4e9c3e267",
+      "targetActivityId": "af7c910d-1c88-4061-888f-af977797609b",
+      "outcome": "Done"
+    },
+    {
+      "$id": "139",
+      "sourceActivityId": "12b89b2c-2fdd-4902-a609-c9e164c80214",
+      "targetActivityId": "edc1bc03-1527-447f-966c-049b413a91b6",
+      "outcome": "Done"
+    },
+    {
+      "$id": "140",
+      "sourceActivityId": "edc1bc03-1527-447f-966c-049b413a91b6",
+      "targetActivityId": "8b9b0fb9-5cbb-44ce-b59d-ac4de917792b",
+      "outcome": "200"
+    },
+    {
+      "$id": "141",
+      "sourceActivityId": "8b9b0fb9-5cbb-44ce-b59d-ac4de917792b",
+      "targetActivityId": "5447e1fc-c9b7-494d-8f34-b2ad71310992",
+      "outcome": "Done"
+    },
+    {
+      "$id": "142",
+      "sourceActivityId": "5447e1fc-c9b7-494d-8f34-b2ad71310992",
+      "targetActivityId": "5752e257-d7ea-4422-a54b-10e8028faf5e",
+      "outcome": "True"
+    },
+    {
+      "$id": "143",
+      "sourceActivityId": "5752e257-d7ea-4422-a54b-10e8028faf5e",
+      "targetActivityId": "12b89b2c-2fdd-4902-a609-c9e164c80214",
+      "outcome": "Done"
+    },
+    {
+      "$id": "144",
+      "sourceActivityId": "2fb28e6c-c718-4b08-889f-e05d379c4f83",
+      "targetActivityId": "12b89b2c-2fdd-4902-a609-c9e164c80214",
+      "outcome": "Done"
+    },
+    {
+      "$id": "145",
+      "sourceActivityId": "9ce41aad-5fc1-420f-868f-ab9720a37ea9",
+      "targetActivityId": "2fb28e6c-c718-4b08-889f-e05d379c4f83",
+      "outcome": "Done"
+    }
+  ],
+  "id": "15c8bd38c1884df88c981ea427f86314"
+}

@@ -1,0 +1,266 @@
+{
+  "$id": "1",
+  "definitionId": "54d7e0678dab4f55a435ad3769eb13d9",
+  "versionId": "c6e90f0a6fcb4cb7bde5e5292a0f8e71",
+  "name": "MCS实时在制数据转换",
+  "displayName": "MCS实时在制数据转换",
+  "description": "MCS实时在制数据转换",
+  "version": 2,
+  "variables": {
+    "$id": "2",
+    "data": {}
+  },
+  "customAttributes": {
+    "$id": "3",
+    "data": {}
+  },
+  "isSingleton": false,
+  "persistenceBehavior": "WorkflowBurst",
+  "deleteCompletedInstances": false,
+  "isPublished": true,
+  "isLatest": true,
+  "activities": [
+    {
+      "$id": "4",
+      "activityId": "702d63ec-7244-4784-b4d1-03dbad0f988b",
+      "type": "HttpEndpoint",
+      "displayName": "接收WebReport请求",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "5",
+          "name": "Path",
+          "expressions": {
+            "$id": "6",
+            "Literal": "/mcswip/getwip"
+          }
+        },
+        {
+          "$id": "7",
+          "name": "Methods",
+          "expressions": {
+            "$id": "8",
+            "Json": "[\"GET\"]"
+          }
+        },
+        {
+          "$id": "9",
+          "name": "ReadContent",
+          "expressions": {
+            "$id": "10"
+          }
+        },
+        {
+          "$id": "11",
+          "name": "TargetType",
+          "expressions": {
+            "$id": "12"
+          }
+        },
+        {
+          "$id": "13",
+          "name": "Schema",
+          "syntax": "Literal",
+          "expressions": {
+            "$id": "14",
+            "Literal": ""
+          }
+        },
+        {
+          "$id": "15",
+          "name": "Authorize",
+          "expressions": {
+            "$id": "16"
+          }
+        },
+        {
+          "$id": "17",
+          "name": "Policy",
+          "expressions": {
+            "$id": "18"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    },
+    {
+      "$id": "19",
+      "activityId": "c1aa8921-e762-4e1b-a227-004ea63c5624",
+      "type": "SendHttpRequest",
+      "displayName": "调用MCS接口 获取原始数据",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "20",
+          "name": "Url",
+          "expressions": {
+            "$id": "21",
+            "Literal": "http://10.22.131.11:5010/Page/RealtimeWIP"
+          }
+        },
+        {
+          "$id": "22",
+          "name": "Method",
+          "expressions": {
+            "$id": "23"
+          }
+        },
+        {
+          "$id": "24",
+          "name": "Content",
+          "expressions": {
+            "$id": "25"
+          }
+        },
+        {
+          "$id": "26",
+          "name": "ContentType",
+          "expressions": {
+            "$id": "27",
+            "Literal": "application/json"
+          }
+        },
+        {
+          "$id": "28",
+          "name": "ReadContent",
+          "expressions": {
+            "$id": "29",
+            "Literal": "true"
+          }
+        },
+        {
+          "$id": "30",
+          "name": "ResponseContentParserName",
+          "expressions": {
+            "$id": "31",
+            "Literal": "JSON"
+          }
+        },
+        {
+          "$id": "32",
+          "name": "ResponseContentTargetType",
+          "expressions": {
+            "$id": "33"
+          }
+        },
+        {
+          "$id": "34",
+          "name": "SupportedStatusCodes",
+          "expressions": {
+            "$id": "35"
+          }
+        },
+        {
+          "$id": "36",
+          "name": "Authorization",
+          "expressions": {
+            "$id": "37"
+          }
+        },
+        {
+          "$id": "38",
+          "name": "RequestHeaders",
+          "expressions": {
+            "$id": "39"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    },
+    {
+      "$id": "40",
+      "activityId": "c18bda5d-0684-4205-89fa-55d8fc3f572a",
+      "type": "FileHandling",
+      "displayName": "File Handling",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "41",
+          "name": "DataType",
+          "expressions": {
+            "$id": "42",
+            "Literal": "object"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    },
+    {
+      "$id": "43",
+      "activityId": "8aed9e35-7569-44dc-9fb6-cf14d5f98209",
+      "type": "WriteHttpResponse",
+      "displayName": "计算MCS数据并返回给WebReport",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "44",
+          "name": "Content",
+          "syntax": "JavaScript",
+          "expressions": {
+            "$id": "45",
+            "JavaScript": "const rawData = JSON.parse(input.response);\r\n//[{\"areaName\":\"东区\",\"domain\":\"212K黄金线\",\"processName\":\"制绒下\",\"allRobotCount\":1,\"allRobotCellCount\":1000,\"wipCellCount\":0,\"freeRobotCount\":1,\"processType\":\"制绒下\",\"wipOverCount\":0,\"totalCell\":1000,\"updateTime\":\"2023-04-11T16:04:00\"},{\"areaName\":\"东区\",\"domain\":\"212K黄金线\",\"processName\":\"扩散下\",\"allRobotCount\":1,\"allRobotCellCount\":1000,\"wipCellCount\":0,\"freeRobotCount\":1,\"processType\":\"扩散下\",\"wipOverCount\":0,\"totalCell\":1000,\"updateTime\":\"2023-04-11T16:04:00\"}];\r\n\r\n// 第一个算法\r\nconst chartData = rawData.reduce((result, item) => {\r\n  const { processName, wipCellCount, allRobotCellCount } = item;\r\n  if (!result[processName]) {\r\n    result[processName] = {\r\n      processName,\r\n      totalWipCellCount: wipCellCount,\r\n      totalAllRobotCellCount: allRobotCellCount,\r\n    };\r\n  } else {\r\n    result[processName].totalWipCellCount += wipCellCount;\r\n    result[processName].totalAllRobotCellCount += allRobotCellCount;\r\n  }\r\n  return result;\r\n}, {});\r\n\r\n// 转换为数组形式\r\nconst chartDataArray = Object.values(chartData);\r\n\r\n// 第二个算法\r\nconst tableData = rawData.reduce((result, item) => {\r\n  const { domain, processName, wipCellCount, allRobotCellCount } = item;\r\n  if (!result[domain]) {\r\n    result[domain] = {\r\n      domain,\r\n    };\r\n  }\r\n  result[domain][`${processName}wipCellCount`] = wipCellCount;\r\n  result[domain][`${processName}allRobotCellCount`] = allRobotCellCount;\r\n  return result;\r\n}, {});\r\n\r\n// 转换为数组形式\r\nconst tableDataArray = Object.values(tableData);\r\n\r\n// 组合两个算法的结果\r\nconst result = {\r\n  chartData: chartDataArray,\r\n  tableData: tableDataArray,\r\n};\r\n\r\nreturn result;\r\n"
+          }
+        },
+        {
+          "$id": "46",
+          "name": "ContentType",
+          "expressions": {
+            "$id": "47",
+            "Literal": "application/json"
+          }
+        },
+        {
+          "$id": "48",
+          "name": "StatusCode",
+          "expressions": {
+            "$id": "49"
+          }
+        },
+        {
+          "$id": "50",
+          "name": "CharSet",
+          "expressions": {
+            "$id": "51"
+          }
+        },
+        {
+          "$id": "52",
+          "name": "ResponseHeaders",
+          "expressions": {
+            "$id": "53"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    }
+  ],
+  "connections": [
+    {
+      "$id": "54",
+      "sourceActivityId": "702d63ec-7244-4784-b4d1-03dbad0f988b",
+      "targetActivityId": "c1aa8921-e762-4e1b-a227-004ea63c5624",
+      "outcome": "Done"
+    },
+    {
+      "$id": "55",
+      "sourceActivityId": "c1aa8921-e762-4e1b-a227-004ea63c5624",
+      "targetActivityId": "c18bda5d-0684-4205-89fa-55d8fc3f572a",
+      "outcome": "Done"
+    },
+    {
+      "$id": "56",
+      "sourceActivityId": "c18bda5d-0684-4205-89fa-55d8fc3f572a",
+      "targetActivityId": "8aed9e35-7569-44dc-9fb6-cf14d5f98209",
+      "outcome": "Done"
+    }
+  ],
+  "id": "c6e90f0a6fcb4cb7bde5e5292a0f8e71"
+}

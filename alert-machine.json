@@ -1,0 +1,233 @@
+{
+  "$id": "1",
+  "definitionId": "d96963a94ebf4d05b1513c2a91c28ff2",
+  "versionId": "387ebafe01ca44cc9627beea9d534f18",
+  "name": "Alert_Machine",
+  "displayName": "设备离线报警",
+  "description": "Alert_Machine",
+  "version": 4,
+  "variables": {
+    "$id": "2",
+    "data": {}
+  },
+  "customAttributes": {
+    "$id": "3",
+    "data": {}
+  },
+  "isSingleton": false,
+  "persistenceBehavior": "WorkflowBurst",
+  "deleteCompletedInstances": false,
+  "isPublished": true,
+  "isLatest": true,
+  "activities": [
+    {
+      "$id": "4",
+      "activityId": "d5e597ca-3687-4faa-b8b8-7ed11cf2f195",
+      "type": "SendMail",
+      "displayName": "Send Mail",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "5",
+          "name": "From",
+          "expressions": {
+            "$id": "6",
+            "Literal": "eapwarningmc@jasolar.com"
+          }
+        },
+        {
+          "$id": "7",
+          "name": "To",
+          "expressions": {
+            "$id": "8",
+            "Json": "[\"wusc@jasolar.com\",\"nj.zhangzc@jasolar.com\",\"loken.li@vskysoft.com\"]",
+            "JavaScript": ""
+          }
+        },
+        {
+          "$id": "9",
+          "name": "Subject",
+          "syntax": "JavaScript",
+          "expressions": {
+            "$id": "10",
+            "JavaScript": "const strToObj = JSON.parse(input.response);\r\nif(strToObj.MessageSubject!=\"\"){\r\nreturn strToObj.MessageSubject;\r\n}else{\r\nreturn \"设备报警\";\r\n}",
+            "Literal": ""
+          }
+        },
+        {
+          "$id": "11",
+          "name": "Attachments",
+          "syntax": "JavaScript",
+          "expressions": {
+            "$id": "12",
+            "Literal": "ces.pdf",
+            "JavaScript": "const strToObj = JSON.parse(input.response);\r\nif(strToObj.WithAttachments){\r\nreturn input.bytes;\r\n}"
+          }
+        },
+        {
+          "$id": "13",
+          "name": "Body",
+          "syntax": "JavaScript",
+          "expressions": {
+            "$id": "14",
+            "JavaScript": "const strToObj = JSON.parse(input.response);\r\nvar result= \"\";\r\n\r\nconst stringarr_Text = strToObj.MessageBodyOfText;\r\nconst stringarr_Image = strToObj.MessageBodyOfImage;\r\nresult+=`${strToObj.MessageTitle}<br />`;\r\nresult+=`<b>${strToObj.MessageHead}</b><br />`;\r\nif(stringarr_Text.length>0){\r\nfor(i=0;i<stringarr_Text.length;i++){\r\nresult+= `${stringarr_Text[i]}<br />`;\r\n}\r\n}\r\nif(stringarr_Image.length>0){\r\nfor(i=0;i<stringarr_Image.length;i++){\r\nresult +=`<img height='200' width='300' src='data:image/png;base64,${stringarr_Image[i]}'><br />`;\r\n}\r\n}\r\nreturn `<html>${result} </html>`",
+            "Literal": ""
+          }
+        },
+        {
+          "$id": "15",
+          "name": "FileLastName",
+          "syntax": "JavaScript",
+          "expressions": {
+            "$id": "16",
+            "JavaScript": "const strToObj = JSON.parse(input.response);\r\nreturn strToObj.FileLastName;",
+            "Literal": ""
+          }
+        },
+        {
+          "$id": "17",
+          "name": "Cc",
+          "expressions": {
+            "$id": "18"
+          }
+        },
+        {
+          "$id": "19",
+          "name": "Bcc",
+          "expressions": {
+            "$id": "20"
+          }
+        },
+        {
+          "$id": "21",
+          "name": "AttachmentIsImage",
+          "expressions": {
+            "$id": "22",
+            "Literal": "True"
+          }
+        },
+        {
+          "$id": "23",
+          "name": "AttachmentsBody",
+          "syntax": "JavaScript",
+          "expressions": {
+            "$id": "24",
+            "JavaScript": "const strToObj = JSON.parse(input.response);\r\nif(strToObj.WithAttachments){\r\nreturn input.imageBytes;\r\n}"
+          }
+        },
+        {
+          "$id": "25",
+          "name": "ImageIsAttachment",
+          "expressions": {
+            "$id": "26",
+            "Literal": "Flase"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    },
+    {
+      "$id": "27",
+      "activityId": "be541702-72cb-498b-9713-48e675f7345a",
+      "type": "HttpEndpoint",
+      "displayName": "HTTP Endpoint",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "28",
+          "name": "Path",
+          "expressions": {
+            "$id": "29",
+            "Literal": "/sendEmail/Machine"
+          }
+        },
+        {
+          "$id": "30",
+          "name": "Methods",
+          "expressions": {
+            "$id": "31",
+            "Json": "[\"POST\"]"
+          }
+        },
+        {
+          "$id": "32",
+          "name": "ReadContent",
+          "expressions": {
+            "$id": "33",
+            "Literal": "true"
+          }
+        },
+        {
+          "$id": "34",
+          "name": "TargetType",
+          "expressions": {
+            "$id": "35",
+            "Literal": "MessageBody"
+          }
+        },
+        {
+          "$id": "36",
+          "name": "Schema",
+          "syntax": "Literal",
+          "expressions": {
+            "$id": "37",
+            "Literal": "{\r\n  \"type\": \"object\",\r\n  \"properties\": {\r\n    \"MessageTitle\": { \"type\": \"string\" },\r\n    \"MessageHead\": { \"type\": \"string\" },\r\n    \"MessageBodyOfText\": { \"type\": \"array\", \"items\": { \"type\": \"string\" } },\r\n    \"MessageBodyOfImage\": { \"type\": \"array\", \"items\": { \"type\": \"string\" } },\r\n    \"WithAttachments\": { \"type\": \"boolean\" },\r\n    \"AttachmentsInfo\": { \"type\": \"array\", \"items\": { \"type\": \"string\" } }\r\n  }\r\n}"
+          }
+        },
+        {
+          "$id": "38",
+          "name": "Authorize",
+          "expressions": {
+            "$id": "39"
+          }
+        },
+        {
+          "$id": "40",
+          "name": "Policy",
+          "expressions": {
+            "$id": "41"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    },
+    {
+      "$id": "42",
+      "activityId": "1ab71124-c211-40d4-8453-9ca16f9d16f6",
+      "type": "FileHandling",
+      "displayName": "File Handling",
+      "persistWorkflow": false,
+      "loadWorkflowContext": false,
+      "saveWorkflowContext": false,
+      "properties": [
+        {
+          "$id": "43",
+          "name": "DataType",
+          "expressions": {
+            "$id": "44"
+          }
+        }
+      ],
+      "propertyStorageProviders": {}
+    }
+  ],
+  "connections": [
+    {
+      "$id": "45",
+      "sourceActivityId": "1ab71124-c211-40d4-8453-9ca16f9d16f6",
+      "targetActivityId": "d5e597ca-3687-4faa-b8b8-7ed11cf2f195",
+      "outcome": "Done"
+    },
+    {
+      "$id": "46",
+      "sourceActivityId": "be541702-72cb-498b-9713-48e675f7345a",
+      "targetActivityId": "1ab71124-c211-40d4-8453-9ca16f9d16f6",
+      "outcome": "Done"
+    }
+  ],
+  "id": "387ebafe01ca44cc9627beea9d534f18"
+}
